@@ -1,0 +1,154 @@
+{
+  "_meta": {
+    "title": "GA4 Ecommerce Data-Layer Reference Schema",
+    "purpose": "A complete, platform-agnostic specification for the dataLayer.push payloads a site should emit for GA4 ecommerce. Hand this to a front-end developer and the measurement is unambiguous.",
+    "conventions": [
+      "Every ecommerce event clears the previous ecommerce object first with: dataLayer.push({ ecommerce: null }); — this prevents item arrays from bleeding between events.",
+      "currency is ISO-4217 (e.g. USD, INR). value is a NUMBER, not a string.",
+      "items[] is item-scoped: parameters set inside an item override event-level ones for that item only.",
+      "transaction_id must be unique and stable per order so GA4 can de-duplicate purchases on refresh/back-button."
+    ]
+  },
+
+  "consent": {
+    "_note": "Pushed BEFORE any tag fires. 'default' runs on every page pre-interaction; 'update' runs after the CMP returns a choice.",
+    "default_state": {
+      "event": "consent_default",
+      "ad_storage": "denied",
+      "analytics_storage": "denied",
+      "ad_user_data": "denied",
+      "ad_personalization": "denied",
+      "wait_for_update": 500
+    },
+    "update_state": {
+      "event": "consent_update",
+      "ad_storage": "granted",
+      "analytics_storage": "granted",
+      "ad_user_data": "granted",
+      "ad_personalization": "granted"
+    }
+  },
+
+  "events": {
+    "view_item": {
+      "_note": "Fires when a product/offer detail is viewed.",
+      "event": "view_item",
+      "ecommerce": {
+        "currency": "USD",
+        "value": 49.0,
+        "items": [
+          {
+            "item_id": "SKU_12345",
+            "item_name": "Sample Product",
+            "item_brand": "SampleBrand",
+            "item_category": "category-a",
+            "item_category2": "subcategory-b",
+            "item_variant": "standard",
+            "price": 49.0,
+            "quantity": 1,
+            "index": 0
+          }
+        ]
+      }
+    },
+
+    "add_to_cart": {
+      "_note": "Fires on add-to-cart. quantity reflects the amount added, not total cart quantity.",
+      "event": "add_to_cart",
+      "ecommerce": {
+        "currency": "USD",
+        "value": 98.0,
+        "items": [
+          {
+            "item_id": "SKU_12345",
+            "item_name": "Sample Product",
+            "item_variant": "standard",
+            "price": 49.0,
+            "quantity": 2,
+            "index": 0
+          }
+        ]
+      }
+    },
+
+    "begin_checkout": {
+      "_note": "Fires when checkout starts. value is the cart subtotal pre-shipping/tax unless your model differs.",
+      "event": "begin_checkout",
+      "ecommerce": {
+        "currency": "USD",
+        "value": 98.0,
+        "coupon": "OPTIONAL_CART_COUPON",
+        "items": [
+          {
+            "item_id": "SKU_12345",
+            "item_name": "Sample Product",
+            "price": 49.0,
+            "quantity": 2,
+            "index": 0
+          }
+        ]
+      }
+    },
+
+    "add_payment_info": {
+      "_note": "Fires when a valid payment method is supplied. payment_type is free-text (card, wallet, upi, etc.).",
+      "event": "add_payment_info",
+      "ecommerce": {
+        "currency": "USD",
+        "value": 98.0,
+        "payment_type": "card",
+        "items": [
+          {
+            "item_id": "SKU_12345",
+            "item_name": "Sample Product",
+            "price": 49.0,
+            "quantity": 2,
+            "index": 0
+          }
+        ]
+      }
+    },
+
+    "purchase": {
+      "_note": "Fires once on order confirmation. transaction_id is REQUIRED and must be unique. value should equal item total + tax + shipping - discount, matching what the business counts as revenue.",
+      "event": "purchase",
+      "ecommerce": {
+        "transaction_id": "ORDER_0001",
+        "currency": "USD",
+        "value": 105.84,
+        "tax": 7.84,
+        "shipping": 0.0,
+        "coupon": "OPTIONAL_CART_COUPON",
+        "items": [
+          {
+            "item_id": "SKU_12345",
+            "item_name": "Sample Product",
+            "item_brand": "SampleBrand",
+            "item_category": "category-a",
+            "item_variant": "standard",
+            "price": 49.0,
+            "quantity": 2,
+            "discount": 0.0,
+            "index": 0
+          }
+        ]
+      }
+    },
+
+    "refund": {
+      "_note": "Full refund: pass transaction_id only. Partial refund: also pass the items[] being refunded. Enables revenue net of refunds in GA4/BigQuery.",
+      "event": "refund",
+      "ecommerce": {
+        "transaction_id": "ORDER_0001",
+        "currency": "USD",
+        "value": 52.92,
+        "items": [
+          {
+            "item_id": "SKU_12345",
+            "quantity": 1
+          }
+        ]
+      }
+    }
+  }
+}
