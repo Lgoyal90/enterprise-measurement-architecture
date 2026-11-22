@@ -20,9 +20,3 @@ a site unchanged.
 - **System first.** The data-layer spec is the source of truth; tags are downstream of it.
 - **Fail safe.** Routing and consent default to the safe state, so a missing signal degrades quietly instead of corrupting production data.
 - **Warehouse-native.** The hard questions (true funnels, net-of-refund revenue, attribution) get answered in BigQuery, not forced through a UI.
-
-## Work with me
-
-Available for freelance measurement architecture — GA4/GTM implementation,
-server-side tagging, BigQuery modeling, and Google Ads measurement.
-Reach out through my freelance profile to scope a project.
